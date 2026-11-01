@@ -1,23 +1,9 @@
-"""
-tools.py : les outils que l'agent peut appeler (partie A et D du TP3).
-
-- search_cases(query, k)        -> recherche dans l'index du TP2 (corpus)
-- read_case(case_id, focus)     -> passages d'une affaire (corpus)
-- external_search(query)        -> recherche web sur des sites juridiques (externe)
-
-Regles communes :
-- chaque resultat porte un champ "source" : "corpus" ou "externe"
-- une erreur ne fait jamais planter l'agent : on renvoie {"error": "..."}
-
-Test rapide :  python tools.py
-"""
-
 from langchain_core.tools import tool
 
 import retrieval
 from retrieval import tokenize
 
-MAX_PASSAGES = 4   # nombre max de passages renvoyes par read_case (le contexte du LLM est limite)
+MAX_PASSAGES = 4  
 
 
 @tool
@@ -26,7 +12,7 @@ def search_cases(query: str, k: int = 3) -> dict:
     Renvoie pour chaque affaire : case_id, date, chambre, score, et son passage le plus pertinent
     (best_chunk = chunk_id a citer, passage = texte). A utiliser en premier."""
     try:
-        k = max(3, min(int(k), 5))       # le LLM demande parfois k=1 : trop peu pour juger
+        k = max(3, min(int(k), 5))    
         results = retrieval.search(query, k=k)
         if not results:
             return {"source": "corpus", "results": [], "message": "Aucun resultat, essaie d'autres mots-cles."}
@@ -46,7 +32,7 @@ def read_case(case_id: str, focus: str = "") -> dict:
         passages = case["passages"]
 
         if focus:
-            # on classe les passages par nombre de mots en commun avec le focus
+    
             focus_words = set(tokenize(focus))
             passages = sorted(passages,
                               key=lambda p: len(focus_words & set(tokenize(p["text"]))),
@@ -83,7 +69,6 @@ def external_search(query: str) -> dict:
 TOOLS = [search_cases, read_case, external_search]
 
 
-# ---------------------------------------------------------------- test rapide
 if __name__ == "__main__":
     print("=== search_cases ===")
     res = search_cases.invoke({"query": "licenciement faute grave", "k": 3})

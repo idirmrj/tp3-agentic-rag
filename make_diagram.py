@@ -1,15 +1,4 @@
-"""
-make_diagram.py : genere le schema du graphe agentique a partir du code LangGraph.
-
-Sorties :
-  docs/architecture.mmd  (texte Mermaid, toujours genere)
-  docs/architecture.png  (image, necessite internet : rendu via mermaid.ink)
-
-Lancer :  python make_diagram.py
-"""
-
 import os
-
 from agent import graph
 
 os.makedirs("docs", exist_ok=True)

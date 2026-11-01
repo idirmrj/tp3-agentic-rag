@@ -40,7 +40,6 @@ llm = ChatOllama(model=MODEL, temperature=0, num_ctx=8192)
 llm_with_tools = llm.bind_tools(TOOLS)
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}
 
-# prompt de l'agent : il choisit des actions, il n'ecrit PAS la reponse
 AGENT_PROMPT = """Tu pilotes la recherche d'un assistant juridique sur des decisions de la Cour de cassation.
 Ton seul role : choisir la prochaine action. Tu n'ecris pas la reponse finale.
 
@@ -56,7 +55,7 @@ Methode :
 4. Si une verification echoue, choisis une action DIFFERENTE pour trouver de nouvelles preuves.
 5. Quand les passages recuperes suffisent pour repondre, ecris seulement : PRET"""
 
-# prompt du redacteur : c'est le "QA fonde sur les passages" du TP2
+# prompt du redacteur TP2
 GENERATE_PROMPT = """Tu reponds a une question juridique UNIQUEMENT a partir des passages fournis.
 - Reprends ce qui est ecrit dans les passages. N'ajoute aucune definition ni connaissance personnelle.
 - Apres chaque phrase, recopie entre crochets l'identifiant du passage utilise,
@@ -71,23 +70,22 @@ DEFAULT_REASON = {
 }
 
 
-# ---------------------------------------------------------------- etat partage
 class State(TypedDict):
     query: str
-    messages: Annotated[list, add_messages]       # historique de l'agent (s'ajoute)
-    documents: dict                               # chunk_id -> passage du corpus
-    external: dict                                # url -> source externe
-    read_cases: list                              # affaires deja lues avec read_case
-    external_done: bool                           # external_search deja appele ?
-    draft: str                                    # derniere reponse redigee
-    evidence_at_draft: int                        # nb de preuves au moment de la redaction
+    messages: Annotated[list, add_messages]      
+    documents: dict                            
+    external: dict                            
+    read_cases: list                          
+    external_done: bool                        
+    draft: str                                 
+    evidence_at_draft: int                    
     iterations: int
     verification: dict
     final_answer: str
     sources: list
     status: str
-    trace: Annotated[list, operator.add]          # lignes de trace (s'ajoutent)
-    n_llm_calls: Annotated[int, operator.add]     # compteur (bonus observabilite)
+    trace: Annotated[list, operator.add]         
+    n_llm_calls: Annotated[int, operator.add]   
 
 
 def log(type_: str, content: str) -> dict:
@@ -98,7 +96,6 @@ def evidence_count(state) -> int:
     return len(state["documents"]) + len(state["external"])
 
 
-# ---------------------------------------------------------------- helpers outils
 def summarize(name: str, result: dict) -> str:
     """resume court d'un resultat d'outil, pour la trace"""
     if name == "search_cases":
@@ -153,7 +150,6 @@ def fallback_action(state):
     return None
 
 
-# ---------------------------------------------------------------- noeuds
 def agent_node(state: State):
     it = state["iterations"] + 1
     response = llm_with_tools.invoke(state["messages"])
@@ -164,7 +160,6 @@ def agent_node(state: State):
         return {"messages": [response], "iterations": it, "n_llm_calls": 1,
                 "trace": [log("DECISION", f"{reason} -> {names}")]}
 
-    # le LLM veut repondre : on verifie que c'est raisonnable
     forced = fallback_action(state)
     if forced:
         name, args, why = forced
@@ -185,7 +180,7 @@ def tools_node(state: State):
         trace.append(log("TOOL", f"{tc['name']}({json.dumps(tc['args'], ensure_ascii=False)})"))
         try:
             result = TOOLS_BY_NAME[tc["name"]].invoke(tc["args"])
-        except Exception as e:                       # outil inconnu ou mauvais arguments
+        except Exception as e:                    
             result = {"error": f"appel invalide de {tc['name']} : {e}"}
 
         if tc["name"] == "external_search":
@@ -205,7 +200,6 @@ def tools_node(state: State):
 
 
 def generate_node(state: State):
-    # les 8 derniers passages du corpus + 3 sources externes, chacun precede de son identifiant
     sources = list(state["documents"].items())[-8:] + list(state["external"].items())[-3:]
     context = "\n\n".join(f"[{sid}] {d['text']}" for sid, d in sources)
 
@@ -252,7 +246,6 @@ def final_node(state: State):
     return {"final_answer": answer, "sources": sources, "status": status, "trace": [log("FINAL", summary)]}
 
 
-# ---------------------------------------------------------------- routage
 def route_after_agent(state: State):
     if state["messages"][-1].tool_calls:
         return "tools" if state["iterations"] < MAX_ITER else "final"
@@ -265,7 +258,6 @@ def route_after_verifier(state: State):
     return "agent" if state["iterations"] < MAX_ITER else "final"
 
 
-# ---------------------------------------------------------------- graphe
 builder = StateGraph(State)
 builder.add_node("agent", agent_node)
 builder.add_node("tools", tools_node)
@@ -283,7 +275,6 @@ builder.add_edge("final", END)
 graph = builder.compile()
 
 
-# ---------------------------------------------------------------- execution
 def initial_state(question: str) -> dict:
     return {"query": question,
             "messages": [SystemMessage(content=AGENT_PROMPT), HumanMessage(content=question)],

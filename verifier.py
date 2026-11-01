@@ -1,17 +1,3 @@
-"""
-verifier.py : verification de la reponse avant de la rendre (partie C du TP3).
-
-Deux couches :
-1. Regles en code (rapide, sans LLM)
-   - la reponse n'est pas vide
-   - des preuves ont ete recuperees
-   - la reponse contient des citations [chunk_id] ou [URL]
-   - chaque citation existe vraiment dans les documents recuperes
-2. LLM juge (seulement si les regles passent)
-   - chaque affirmation est-elle appuyee par les passages cites ?
-   - sortie JSON validee en code
-"""
-
 import json
 import os
 import re
@@ -21,11 +7,10 @@ from langchain_ollama import ChatOllama
 
 MODEL = os.getenv("MODEL", "qwen2.5:7b")
 
-# format="json" force Ollama a produire du JSON valide
 judge_llm = ChatOllama(model=MODEL, temperature=0, format="json", num_ctx=8192)
 
-CORPUS_CITATION = re.compile(r"\[([^\[\]\s]+#\d+)\]")      # ex: [abc123#2]
-URL_CITATION = re.compile(r"\[(https?://[^\[\]\s]+)\]")     # ex: [https://...]
+CORPUS_CITATION = re.compile(r"\[([^\[\]\s]+#\d+)\]")     
+URL_CITATION = re.compile(r"\[(https?://[^\[\]\s]+)\]")    
 
 JUDGE_PROMPT = """Tu es un verificateur juridique strict.
 On te donne une REPONSE et les PASSAGES qu'elle cite.
@@ -40,7 +25,7 @@ def verify(answer: str, documents: dict, external: dict) -> dict:
     reasons = []
     citations = list(dict.fromkeys(CORPUS_CITATION.findall(answer) + URL_CITATION.findall(answer)))
 
-    # ---------- couche 1 : regles
+    # couche 1 
     if "PREUVES INSUFFISANTES" in answer.upper():
         return {"ok": False, "reasons": ["les passages recuperes ne repondent pas a la question"],
                 "citations": [], "llm_calls": 0}
@@ -57,7 +42,7 @@ def verify(answer: str, documents: dict, external: dict) -> dict:
     if reasons:
         return {"ok": False, "reasons": reasons, "citations": citations, "llm_calls": 0}
 
-    # ---------- couche 2 : LLM juge
+    # couche 2 : LLM juge
     passages = "\n\n".join(f"[{c}] {(documents.get(c) or external.get(c))['text']}" for c in citations)
     try:
         raw = judge_llm.invoke([
@@ -68,7 +53,6 @@ def verify(answer: str, documents: dict, external: dict) -> dict:
         supported = bool(verdict.get("supported", False))
         claims = verdict.get("unsupported_claims") or []
     except Exception as e:
-        # juge illisible : on garde le resultat des regles, mais on le signale dans la trace
         return {"ok": True, "reasons": [f"juge LLM illisible ({e}), regles OK"],
                 "citations": citations, "llm_calls": 1}
 
