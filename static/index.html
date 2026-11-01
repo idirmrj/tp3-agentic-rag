@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic RAG Jurisprudence</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #6b7280; --border: #e3e6eb;
+    --accent: #2f5fd0;
+    --decision: #6d4bc4; --tool: #2f5fd0; --obs: #1f8a5b; --check: #b7791f;
+    --final: #111827; --error: #c53030;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  h2 { font-size: 15px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+
+  .ask { display: flex; gap: 8px; }
+  .ask input { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font: inherit; }
+  button { padding: 10px 16px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .examples { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .examples button { background: #eef2fb; color: var(--accent); padding: 4px 10px; font-size: 13px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .ask { flex-direction: column; } }
+
+  .trace { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow-y: auto; }
+  .trace li { display: grid; grid-template-columns: 28px 110px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .trace .n { color: var(--muted); text-align: right; }
+  .trace .t { font-weight: 600; font-family: ui-monospace, Consolas, monospace; }
+  .trace .c { word-break: break-word; }
+  .DECISION .t { color: var(--decision); } .TOOL .t { color: var(--tool); }
+  .OBSERVATION .t { color: var(--obs); } .CHECK .t { color: var(--check); }
+  .FINAL .t { color: var(--final); } .DRAFT .t { color: var(--decision); } .ERROR .t, .ERROR .c { color: var(--error); }
+  .TOOL .c { font-family: ui-monospace, Consolas, monospace; }
+  .running { color: var(--muted); font-style: italic; padding: 8px 0; }
+
+  .answer { white-space: pre-wrap; }
+  .cite { background: #eef2fb; color: var(--accent); border-radius: 4px; padding: 0 4px; font-size: 12px; font-family: ui-monospace, Consolas, monospace; }
+  .status { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 99px; margin-bottom: 8px; }
+  .status.ok { background: #e3f4ec; color: var(--obs); } .status.ko { background: #fde8e8; color: var(--error); }
+
+  .source { border-top: 1px solid var(--border); padding: 8px 0; font-size: 13px; }
+  .badge { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; margin-right: 6px; }
+  .badge.corpus { background: #e3f4ec; color: var(--obs); } .badge.externe { background: #fdf2e0; color: var(--check); }
+  .source .id { font-family: ui-monospace, Consolas, monospace; word-break: break-all; }
+  .source p { margin: 4px 0 0; color: var(--muted); }
+
+  .stats { display: flex; gap: 20px; font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .stats b { color: var(--text); }
+  .empty { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Assistant jurisprudence</h1>
+  <p class="sub">Agentic RAG sur les décisions de la Cour de cassation</p>
+
+  <div class="card">
+    <form class="ask" id="form">
+      <input id="q" placeholder="Pose une question juridique..." autocomplete="off" required>
+      <button id="go">Lancer</button>
+    </form>
+    <div class="examples">
+      <button type="button" data-q="Qu'est-ce qui caractérise une faute grave en droit du travail ?">S1 : RAG simple</button>
+      <button type="button" data-q="Trouve une affaire de licenciement pour faute grave, lis la décision et donne la solution retenue par la Cour et ses motifs.">S2 : multi-étapes</button>
+      <button type="button" data-q="Mon patron m'a viré parce que j'ai posté des trucs sur Facebook, est-ce que c'est légal ?">S3 : info insuffisante</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Trace d'exécution</h2>
+      <ul class="trace" id="trace"><li class="empty" style="display:block">Aucun run pour l'instant.</li></ul>
+      <div class="running" id="running" hidden>Agent en cours...</div>
+    </div>
+
+    <div class="card">
+      <h2>Réponse</h2>
+      <div id="answer" class="empty">La réponse vérifiée s'affichera ici.</div>
+      <div class="stats" id="stats"></div>
+      <h2 style="margin-top:20px">Sources citées</h2>
+      <div id="sources" class="empty">-</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let step = 0;
+
+// echappe le HTML pour ne jamais injecter du texte brut venant du serveur
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function addTrace(entry) {
+  step += 1;
+  const li = document.createElement("li");
+  li.className = entry.type;
+  li.innerHTML = `<span class="n">${step}</span><span class="t">${esc(entry.type)}</span><span class="c">${esc(entry.content)}</span>`;
+  $("trace").appendChild(li);
+  $("trace").scrollTop = $("trace").scrollHeight;
+}
+
+function showResult(r) {
+  const ok = r.status === "ok";
+  // les citations [xxx] sont mises en valeur
+  const answer = esc(r.answer).replace(/\[([^\[\]\s]+)\]/g, '<span class="cite">$1</span>');
+  $("answer").className = "";
+  $("answer").innerHTML = `<span class="status ${ok ? "ok" : "ko"}">${ok ? "Vérifiée" : "Arrêt contrôlé"}</span><div class="answer">${answer}</div>`;
+
+  $("stats").innerHTML =
+    `<span>Appels LLM <b>${r.stats.llm_calls}</b></span>` +
+    `<span>Appels outils <b>${r.stats.tool_calls}</b></span>` +
+    `<span>Latence <b>${r.stats.latency_s} s</b></span>`;
+
+  $("sources").className = "";
+  $("sources").innerHTML = r.sources.length
+    ? r.sources.map(s => `<div class="source">
+        <span class="badge ${s.source}">${s.source === "corpus" ? "Corpus" : "Externe"}</span>
+        <span class="id">${esc(s.id)}</span>
+        <p>${esc(s.text.slice(0, 300))}...</p></div>`).join("")
+    : '<span class="empty">Aucune source.</span>';
+}
+
+function reset() {
+  step = 0;
+  $("trace").innerHTML = "";
+  $("answer").className = "empty"; $("answer").textContent = "En attente de la réponse...";
+  $("sources").className = "empty"; $("sources").textContent = "-";
+  $("stats").innerHTML = "";
+}
+
+function run(question) {
+  reset();
+  $("go").disabled = true; $("running").hidden = false;
+
+  const es = new EventSource("/run?question=" + encodeURIComponent(question));
+  const done = () => { es.close(); $("go").disabled = false; $("running").hidden = true; };
+
+  es.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+    if (d.type === "END") return done();
+    if (d.type === "RESULT") return showResult(d);
+    addTrace(d);
+  };
+  es.onerror = () => { addTrace({type: "ERROR", content: "Connexion au serveur perdue"}); done(); };
+}
+
+$("form").addEventListener("submit", (e) => { e.preventDefault(); run($("q").value.trim()); });
+document.querySelectorAll(".examples button").forEach(b =>
+  b.addEventListener("click", () => { $("q").value = b.dataset.q; run(b.dataset.q); }));
+</script>
+</body>
+</html>

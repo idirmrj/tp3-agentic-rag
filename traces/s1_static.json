@@ -1,0 +1,11 @@
+{
+  "scenario": "s1",
+  "titre": "RAG simple",
+  "question": "Qu'est-ce qui caractérise une faute grave en droit du travail ?",
+  "attendu": "une seule recherche suffit, peu d'etapes",
+  "answer": "Selon les passages fournis, une faute grave en droit du travail peut se manifester de différentes manières. Par exemple :\n\n- Dans le premier passage [6079b1f69ba5988459c546c0#0], il est mentionné que l'article 6 du contrat prévoyait la nécessité d'une mise en demeure restée sans effet pour pouvoir invoquer une faute grave de nature à entraîner la rupture du contrat. La violation de cet article par l'employeur, qui n'a pas respecté cette procédure, a été considérée comme une faute grave.\n\n- Dans le troisième passage [6079b1f79ba5988459c548a8#0], il est indiqué que l'employeur ne peut être condamné à verser des dommages-intérêts envers l'autre partie que si celle-ci prouve, outre le préjudice subi, l'existence d'une faute qui lui soit légalement imputable. Cela suggère qu'il faut une preuve de la faute de l'employé pour justifier un licenciement sans cause réelle et sérieuse.\n\nCes passages montrent que la notion de faute grave est liée à des violations graves du contrat ou des règles légales, mais aussi à la non-preuve par l'employé de son comportement fautif.",
+  "latency_s": 50.9,
+  "llm_calls": 1,
+  "verified": true,
+  "reasons": []
+}

@@ -17,17 +17,21 @@ import re
 
 from rank_bm25 import BM25Okapi
 
-N_DECISIONS = 3000    
-CHUNK_WORDS = 400 
-OVERLAP_WORDS = 50   
+# ---------------------------------------------------------------- config
+N_DECISIONS = 3000      # taille du sous-ensemble (monter a 10000 si ca tourne vite)
+CHUNK_WORDS = 400       # taille d'un chunk en mots
+OVERLAP_WORDS = 50      # chevauchement entre deux chunks
 INDEX_PATH = "data/index.pkl"
 
+# petits mots francais qu'on ignore dans BM25
 STOPWORDS = set("""
 le la les un une des du de d l et ou en au aux a à ce ces cet cette qui que quoi
 dont il elle ils elles on se sa son ses leur leurs par pour sur dans avec sans
 est sont été être a ont pas ne n y s qu c plus comme mais si
 """.split())
 
+
+# ---------------------------------------------------------------- utils
 def tokenize(text: str) -> list[str]:
     """minuscules + mots alphanumeriques + suppression des stopwords"""
     words = re.findall(r"\w+", text.lower())
@@ -46,6 +50,7 @@ def chunk_text(text: str) -> list[str]:
     return chunks
 
 
+# ---------------------------------------------------------------- construction
 def build_index():
     from datasets import load_dataset
 
@@ -53,15 +58,15 @@ def build_index():
     ds = load_dataset("antoinejeannot/jurisprudence", "cour_de_cassation",
                       split="train", streaming=True)
 
-    cases = {}  
-    chunks = [] 
+    cases = {}    # case_id -> metadonnees
+    chunks = []   # liste de {chunk_id, case_id, text}
 
     for i, row in enumerate(ds):
         if i == 0:
             print("Colonnes du dataset :", list(row.keys()))
 
         text = row.get("text") or ""
-        if len(text.split()) < 100:   
+        if len(text.split()) < 100:      # on saute les decisions vides ou trop courtes
             continue
 
         case_id = str(row.get("id") or row.get("number") or i)
@@ -87,6 +92,7 @@ def build_index():
     print(f"Index sauvegarde dans {INDEX_PATH}")
 
 
+# ---------------------------------------------------------------- chargement
 _INDEX = None
 
 def load_index():
@@ -100,6 +106,7 @@ def load_index():
     return _INDEX
 
 
+# ---------------------------------------------------------------- API utilisee par les outils
 def search(query: str, k: int = 5) -> list[dict]:
     """
     Renvoie les k affaires les plus pertinentes.
@@ -121,7 +128,7 @@ def search(query: str, k: int = 5) -> list[dict]:
             **idx["cases"][chunk["case_id"]],
             "score": round(float(scores[i]), 2),
             "best_chunk": chunk["chunk_id"],
-            "extrait": chunk["text"][:300] + "...",
+            "passage": chunk["text"],   # passage complet : vraie preuve citable
         })
     return results
 
@@ -136,6 +143,7 @@ def get_case(case_id: str) -> dict:
     return {**idx["cases"][case_id], "passages": passages}
 
 
+# ---------------------------------------------------------------- test rapide
 if __name__ == "__main__":
     if not os.path.exists(INDEX_PATH):
         build_index()
@@ -145,7 +153,7 @@ if __name__ == "__main__":
     results = search(query, k=3)
     for r in results:
         print(f"- {r['case_id']} | {r['date']} | {r['chambre']} | score {r['score']}")
-        print(f"  {r['extrait'][:150]}")
+        print(f"  {r['passage'][:150]}")
 
     if results:
         case = get_case(results[0]["case_id"])

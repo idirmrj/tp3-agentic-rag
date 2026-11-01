@@ -1,0 +1,63 @@
+{
+  "scenario": "s2",
+  "titre": "Recherche multi-etapes",
+  "question": "Trouve une affaire de licenciement pour faute grave, lis la décision et donne la solution retenue par la Cour et ses motifs.",
+  "attendu": "trouver une affaire (search_cases) puis la lire (read_case)",
+  "trace": [
+    {
+      "type": "DECISION",
+      "content": "Preuve documentaire necessaire : recherche dans le corpus -> search_cases"
+    },
+    {
+      "type": "TOOL",
+      "content": "search_cases({\"k\": 3, \"query\": \"licenciement faute grave\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "3 affaires : 6079b1f69ba5988459c547a8 (13.06), 60343641d5b4be279b2bc0e5 (12.93), 6079b1f69ba5988459c546c0 (12.91)"
+    },
+    {
+      "type": "DECISION",
+      "content": "Besoin des passages exacts : lecture d'une affaire -> read_case"
+    },
+    {
+      "type": "TOOL",
+      "content": "read_case({\"case_id\": \"6079b1f69ba5988459c547a8\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "Affaire 6079b1f69ba5988459c547a8 du 1965-04-29 : 1 passages lus sur 1"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuves jugees suffisantes : redaction de la reponse"
+    },
+    {
+      "type": "DRAFT",
+      "content": "Reponse redigee a partir de 3 passages, 1 citations"
+    },
+    {
+      "type": "CHECK",
+      "content": "Preuves suffisantes : oui, 1 citations valides"
+    },
+    {
+      "type": "FINAL",
+      "content": "Statut : ok. 1 sources citees (1 corpus, 0 externe)"
+    }
+  ],
+  "type": "RESULT",
+  "answer": "La cour a condamné la société Peperiot Frères à verser une indemnité de licenciement à X..., chef d'équipe licencié sur le champ pour attitude grossière et injurieuse, malgré que sa faute puisse être assez grave pour priver du préavis. Les juges ont estimé que la gravité de la faute n'était pas suffisante pour priver X des fruits de son travail satisfaisant pendant 12 ans. [6079b1f69ba5988459c547a8#0]",
+  "sources": [
+    {
+      "id": "6079b1f69ba5988459c547a8#0",
+      "source": "corpus",
+      "text": "SUR LE MOYEN UNIQUE : VU L'ARTICLE 1134 DU CODE CIVIL ET L'ARTICLE 7 DE LA LOI DU 20 AVRIL 1810 ; ATTENDU QUE, POUR CONDAMNER LA SOCIETE PEPERIOT FRERES A PAYER UNE INDEMNITE DE LICENCIEMENT A X..., CHEF D'EQUIPE QU'ELLE AVAIT LICENCIE SUR LE CHAMP LE 20 SEPTEMBRE 1961 POUR ATTITUDE GROSSIERE ET INJURIEUSE A L'EGARD D'UN INGENIEUR DE L'EDF CHARGE DU CONTROLE DU CHANTIER QUI LUI FAISAIT DES OBSERVATIONS, L'ARRET ATTAQUE SE FONDE SUR CE MOTIF QUE LA FAUTE COMMISE, PEUT ETRE ASSEZ GRAVE POUR LE PRIVER DU PREAVIS, NE CONSTITUAIT PAS LA FAUTE PARTICULIEREMENT LOURDE QUI SERAIT NECESSAIRE POUR LE PRIVER DES FRUITS DE SON TRAVAIL SATISFAISANT PENDANT 12 ANS AUX TERMES DE CETTE ENTREPRISE ; QU'EN STATUANT AINSI, ALORS QU'ILS RELEVAIENT A L'ENCONTRE DE X... UNE FAUTE DONT LA GRAVITE ETAIT SUFFISANTE POUR PRIVER CELUI-CI DE L'INDEMNITE DE LICENCIEMENT AU MEME TITRE QUE DE L'INDEMNITE COMPENSATRICE DE PREAVIS, LES JUGES DU FOND N'ONT PAS TIRE DE LEURS CONSTATATIONS LES CONSEQUENCES JURIDIQUES QUI EN DECOULAIENT ; PAR CES MOTIFS : CASSE ET ANNULE L'ARRET RENDU ENTRE LES PARTIES PAR LA COUR D'APPEL DE BORDEAUX LE 18 FEVRIER 1963 ; REMET EN CONSEQUENCE LA CAUSE ET LES PARTIES AU MEME ET SEMBLABLE ETAT OU ELLES ETAIENT AVANT LEDIT ARRET ET, POUR ETRE FAIT DROIT, LES RENVOIE DEVANT LA COUR D'APPEL D'AGEN. N° 64-40 286. SOCIETE PEPERIOT FRERES C/ X.... PRESIDENT : M VIGNERON-RAPPORTEUR : M BOUCLY-AVOCAT GENERAL : M LESSELIN-AVOCAT : M RAVEL. A RAPPROCHER : 30 JANVIER 1963, BULL 1963, IV, N° 105 (1°), P 85."
+    }
+  ],
+  "status": "ok",
+  "stats": {
+    "llm_calls": 5,
+    "tool_calls": 2,
+    "latency_s": 159.4
+  }
+}

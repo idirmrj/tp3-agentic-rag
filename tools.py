@@ -21,15 +21,17 @@ MAX_PASSAGES = 4   # nombre max de passages renvoyes par read_case (le contexte 
 
 
 @tool
-def search_cases(query: str, k: int = 5) -> dict:
+def search_cases(query: str, k: int = 3) -> dict:
     """Recherche des decisions de la Cour de cassation dans le corpus local.
-    Renvoie une liste d'affaires avec case_id, date, chambre, score et un court extrait.
-    A utiliser en premier pour trouver des affaires pertinentes."""
+    Renvoie pour chaque affaire : case_id, date, chambre, score, et son passage le plus pertinent
+    (best_chunk = chunk_id a citer, passage = texte). A utiliser en premier."""
     try:
+        k = max(3, min(int(k), 5))       # le LLM demande parfois k=1 : trop peu pour juger
         results = retrieval.search(query, k=k)
         if not results:
             return {"source": "corpus", "results": [], "message": "Aucun resultat, essaie d'autres mots-cles."}
-        return {"source": "corpus", "results": results}
+        return {"source": "corpus", "results": results,
+                "note": "Un seul passage par affaire. Pour la decision complete (solution, motifs), utilise read_case."}
     except Exception as e:
         return {"source": "corpus", "error": f"search_cases a echoue : {e}"}
 

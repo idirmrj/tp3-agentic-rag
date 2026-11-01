@@ -1,0 +1,87 @@
+{
+  "scenario": "s1",
+  "titre": "RAG simple",
+  "question": "Qu'est-ce qui caractérise une faute grave en droit du travail ?",
+  "attendu": "une seule recherche suffit, peu d'etapes",
+  "trace": [
+    {
+      "type": "DECISION",
+      "content": "Preuve documentaire necessaire : recherche dans le corpus -> search_cases"
+    },
+    {
+      "type": "TOOL",
+      "content": "search_cases({\"k\": 3, \"query\": \"faute grave\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "3 affaires : 60793aab9ba5988459c3c220 (10.49), 6079b1f69ba5988459c546c0 (9.54), 6079b1f49ba5988459c544d1 (9.4)"
+    },
+    {
+      "type": "DECISION",
+      "content": "Besoin des passages exacts : lecture d'une affaire -> read_case"
+    },
+    {
+      "type": "TOOL",
+      "content": "read_case({\"case_id\": \"6079b1f69ba5988459c546c0\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "Affaire 6079b1f69ba5988459c546c0 du 1965-01-25 : 2 passages lus sur 2"
+    },
+    {
+      "type": "DECISION",
+      "content": "Besoin des passages exacts : lecture d'une affaire -> read_case"
+    },
+    {
+      "type": "TOOL",
+      "content": "read_case({\"case_id\": \"60793aab9ba5988459c3c220\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "Affaire 60793aab9ba5988459c3c220 du 1961-04-26 : 2 passages lus sur 2"
+    },
+    {
+      "type": "DECISION",
+      "content": "Besoin des passages exacts : lecture d'une affaire -> read_case"
+    },
+    {
+      "type": "TOOL",
+      "content": "read_case({\"case_id\": \"6079b1f49ba5988459c544d1\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "Affaire 6079b1f49ba5988459c544d1 du 1965-02-03 : 2 passages lus sur 2"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuves jugees suffisantes : redaction de la reponse"
+    },
+    {
+      "type": "DRAFT",
+      "content": "Reponse redigee a partir de 6 passages, 1 citations"
+    },
+    {
+      "type": "CHECK",
+      "content": "Preuves suffisantes : oui, 1 citations valides"
+    },
+    {
+      "type": "FINAL",
+      "content": "Statut : ok. 1 sources citees (1 corpus, 0 externe)"
+    }
+  ],
+  "type": "RESULT",
+  "answer": "Selon les passages fournis, une faute grave en droit du travail peut être caractérisée par la violation d'une obligation contractuelle prévue comme telle dans le contrat de travail. Par exemple, l'article 6 d'un contrat mentionné indique que l'inexécution d'une obligation, après mise en demeure restée sans effet, sera considérée comme une faute grave entraînant la rupture du contrat sans délai ni indemnité. [6079b1f69ba5988459c546c0#0]",
+  "sources": [
+    {
+      "id": "6079b1f69ba5988459c546c0#0",
+      "source": "corpus",
+      "text": "SUR LE MOYEN UNIQUE, PRIS DE LA VIOLATION DES ARTICLES 1134 ET 1382 DU CODE CIVIL, 23 DU LIVRE 1ER DU CODE DU TRAVAIL, 7 DE LA LOI DU 20 AVRIL 1810, DENATURATION DES DOCUMENTS DE LA CAUSE, DEFAUT DE MOTIFS ET MANQUE DE BASE LEGALE ; ATTENDU QU'IL EST FAIT GRIEF A L'ARRET ATTAQUE D'AVOIR REFUSE D'ALLOUER A X..., REPRESENTANT DE COMMERCE LICENCIE PAR SON EMPLOYEUR, LA SOCIETE PIRELLI FRANCE, LE 13 FEVRIER 1963, DES DOMMAGES-INTERETS POUR RUPTURE ABUSIVE DE SON CONTRAT DE TRAVAIL, AU MOTIF QUE L'ARTICLE 6 DE SON CONTRAT DE TRAVAIL QU'IL A PRETENDU AVOIR ETE VIOLE, \" NE VISE QUE LE RENVOI FAUTIF DE X... ET NE DEROGE EN RIEN AU DROIT COMMUN EN MATIERE DE RUPTURE DU CONTRAT ; QU'IL INCOMBE A X..., POUR SOUTENIR SA DEMANDE, DE RAPPORTER LA PREUVE QUE LA SOCIETE A COMMIS UNE FAUTE, CE QU'IL NE FAIT PAS NI N'OFFRE DE FAIRE \", ALORS QUE, D'UNE PART, CET ARTICLE 6 PREVOYANT LA NECESSITE D'UNE MISE EN DEMEURE RESTEE SANS EFFET POUR POUVOIR INVOQUER UNE FAUTE GRAVE DE NATURE A ENTRAINER LA RUPTURE DU CONTRAT, L'ARRET ATTAQUE NE POUVAIT, SANS DENATURER CETTE CLAUSE, DECLARER QUE LEDIT ARTICLE NE DEROGEAIT PAS AU DROIT COMMUN EN MATIERE DE RUPTURE DE CONTRAT, ALORS QUE, D'AUTRE PART, X... SE PREVALAIT DE LA FAUTE COMMISE PAR SON EMPLOYEUR QUI, L'AYANT LICENCIE POUR FAUTE GRAVE, NE LUI AVAIT PAS FAIT TENIR LA MISE EN DEMEURE PREVUE A L'ARTICLE 6 ET L'AVAIT LICENCIE EN VIOLATION DES REGLES DE CE CONTRAT, QU'IL AVAIT DES LORS DROIT A INDEMNITE POUR RUPTURE ABUSIVE, LE LICENCIEMENT EFFECTUE EN VIOLATION DES REGLES DU CONTRAT PARTICULIER OU DES CONVENTIONS COLLECTIVES APPLICABLES DONNANT OUVERTURE A CETTE INDEMNITE ; MAIS ATTENDU QUE L'ARRET ATTAQUE CONSTATE QU'A L'APPUI DE SA DEMANDE D'INDEMNITE POUR RUPTURE ABUSIVE DE SON CONTRAT DE TRAVAIL A L'ENCONTRE DE SON ANCIEN EMPLOYEUR, LA SOCIETE PIRELLI FRANCE, X... S'EST FONDE EXCLUSIVEMENT SUR LE FAIT QU'ELLE L'AVAIT LICENCIE SANS LUI AVOIR ADRESSE LA MISE EN DEMEURE PREVUE AU DERNIER ALINEA DE L'ARTICLE 6 DUDIT CONTRAT AINSI CONCU : \" L'INEXECUTION DE L'UNE DES OBLIGATIONS CONTENUES DANS LE PRESENT ARTICLE SERA CONSIDEREE, APRES UNE MISE EN DEMEURE RESTEE SANS EFFET, COMME UNE FAUTE GRAVE DE NATURE A ENTRAINER LA RUPTURE DU CONTRAT SANS DELAI NI INDEMNITE, ETANT SPECIFIE QUE L'ENUMERATION CI-DESSUS DE CES OBLIGATIONS N'EST PAS LIMITATIVE \" ; QUE LES JUGES DU FOND, INTERPRETANT"
+    }
+  ],
+  "status": "ok",
+  "stats": {
+    "llm_calls": 7,
+    "tool_calls": 4,
+    "latency_s": 133.1
+  }
+}

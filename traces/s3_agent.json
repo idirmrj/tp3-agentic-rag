@@ -1,0 +1,81 @@
+{
+  "scenario": "s3",
+  "titre": "Information insuffisante",
+  "question": "Mon patron m'a viré parce que j'ai posté des trucs sur Facebook, est-ce que c'est légal ?",
+  "attendu": "premier retrieval insuffisant -> reformulation ou external_search",
+  "trace": [
+    {
+      "type": "DECISION",
+      "content": "Preuve documentaire necessaire : recherche dans le corpus -> search_cases"
+    },
+    {
+      "type": "TOOL",
+      "content": "search_cases({\"k\": 3, \"query\": \"licenciement pour faute grave due à des publications sur les réseaux sociaux\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "3 affaires : 60343641d5b4be279b2bc0e5 (15.78), 6079b1f79ba5988459c547f5 (15.07), 6079b1f59ba5988459c54692 (14.87)"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuve documentaire necessaire : recherche dans le corpus -> search_cases"
+    },
+    {
+      "type": "TOOL",
+      "content": "search_cases({\"k\": 3, \"query\": \"licenciement pour faute grave due à des publications sur les réseaux sociaux\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "3 affaires : 60343641d5b4be279b2bc0e5 (15.78), 6079b1f79ba5988459c547f5 (15.07), 6079b1f59ba5988459c54692 (14.87)"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuves jugees suffisantes : redaction de la reponse"
+    },
+    {
+      "type": "DRAFT",
+      "content": "Reponse redigee a partir de 3 passages, 1 citations"
+    },
+    {
+      "type": "CHECK",
+      "content": "Preuves suffisantes : non -> les passages recuperes ne repondent pas a la question"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuve documentaire necessaire : recherche dans le corpus -> search_cases"
+    },
+    {
+      "type": "TOOL",
+      "content": "search_cases({\"k\": 3, \"query\": \"licenciement pour faute professionnelle due à des publications sur les réseaux sociaux\"})"
+    },
+    {
+      "type": "OBSERVATION",
+      "content": "3 affaires : 6079b1f69ba5988459c546bd (14.91), 6079b1f69ba5988459c546ef (12.97), 6079b1f79ba5988459c547f5 (11.61)"
+    },
+    {
+      "type": "DECISION",
+      "content": "Preuves jugees suffisantes : redaction de la reponse"
+    },
+    {
+      "type": "DRAFT",
+      "content": "Reponse redigee a partir de 5 passages, 0 citations"
+    },
+    {
+      "type": "CHECK",
+      "content": "Preuves suffisantes : non -> les passages recuperes ne repondent pas a la question"
+    },
+    {
+      "type": "FINAL",
+      "content": "Statut : max_iterations. 0 sources citees (0 corpus, 0 externe)"
+    }
+  ],
+  "type": "RESULT",
+  "answer": "Je n'ai pas trouve de preuves suffisantes pour repondre de facon fiable (limite de 5 decisions atteinte).",
+  "sources": [],
+  "status": "max_iterations",
+  "stats": {
+    "llm_calls": 7,
+    "tool_calls": 3,
+    "latency_s": 96.9
+  }
+}

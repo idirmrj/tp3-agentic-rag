@@ -1,0 +1,13 @@
+{
+  "scenario": "s3",
+  "titre": "Information insuffisante",
+  "question": "Mon patron m'a viré parce que j'ai posté des trucs sur Facebook, est-ce que c'est légal ?",
+  "attendu": "premier retrieval insuffisant -> reformulation ou external_search",
+  "answer": "Les passages fournis ne traitent pas spécifiquement de la situation où un employeur peut licencier un salarié pour des publications sur les réseaux sociaux. Ils abordent plutôt des questions liées au droit du travail et à l'appréciation de la faute dans le cadre d'un licenciement.\n\nPour répondre directement à votre question, il n'y a pas de texte spécifique dans ces passages qui traitent exactement de ce cas particulier. Cependant, en général, selon les principes du droit du travail français, un employeur peut licencier un salarié pour des faits graves liés au poste de travail ou à la discipline de l'entreprise, y compris certaines activités sur les réseaux sociaux si elles sont considérées comme nuisibles pour l'image de l'entreprise. Cependant, ce type de licenciement doit respecter le droit du travail et ne pas être abusif.\n\nPour une réponse précise à votre situation spécifique, il serait nécessaire d'examiner la nature exacte des publications sur Facebook, leur impact potentiel sur l'entreprise, ainsi que les procédures internes de l'entreprise concernant ce type de comportement.",
+  "latency_s": 39.2,
+  "llm_calls": 1,
+  "verified": false,
+  "reasons": [
+    "aucune citation [chunk_id] ou [URL] dans la reponse"
+  ]
+}

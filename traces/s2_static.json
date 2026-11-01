@@ -1,0 +1,11 @@
+{
+  "scenario": "s2",
+  "titre": "Recherche multi-etapes",
+  "question": "Trouve une affaire de licenciement pour faute grave, lis la décision et donne la solution retenue par la Cour et ses motifs.",
+  "attendu": "trouver une affaire (search_cases) puis la lire (read_case)",
+  "answer": "La décision concernant un licenciement pour faute grave est présente dans le troisième passage fourni [6079b1f69ba5988459c547a8#0].\n\n**Décision :**\nL'arrêt attaque condamne la société Peperiot Frères à verser une indemnité de licenciement à X, chef d'équipe qu'elle avait licencié sur le champ le 20 septembre 1961 pour attitude grossière et injurieuse envers un ingénieur de l'EDF chargé du contrôle du chantier qui lui faisait des observations.\n\n**Solution retenue par la Cour :**\nPar ces motifs, la cour casse et annule l'arrêt rendu entre les parties par la cour d'appel de Bordeaux le 18 février 1963. Elle remet en conséquence la cause et les parties au même état ou elles étaient avant ledit arrêt et, pour être fait droit, les renvoie devant la cour d'appel d'Agen.\n\n**Motifs :**\n- Pour condamner la société Peperiot Frères à payer une indemnité de licenciement à X, chef d'équipe qu'elle avait licencié sur le champ le 20 septembre 1961 pour attitude grossière et injurieuse envers un ingénieur de l'EDF chargé du contrôle du chantier qui lui faisait des observations, l'arrêt attaqué se fonde sur ce motif que la faute commise peut être assez grave pour le priver du préavis, ne constituant pas la faute particulièrement lourde qui serait nécessaire pour le priver des fruits de son travail satisfaisant pendant 12 ans aux termes de cette entreprise.\n- En statuant ainsi, alors qu'ils relevaient à l'égard de X une faute dont la gravité était suffisante pour lui priver de l'indemnité de licenciement au même titre que de l'indemnité compensatrice de préavis, les juges du fond n'ont pas tiré de leurs constatations les conséquences juridiques qui en découlaient.",
+  "latency_s": 75.3,
+  "llm_calls": 1,
+  "verified": true,
+  "reasons": []
+}

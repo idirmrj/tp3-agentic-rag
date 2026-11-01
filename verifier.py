@@ -41,6 +41,9 @@ def verify(answer: str, documents: dict, external: dict) -> dict:
     citations = list(dict.fromkeys(CORPUS_CITATION.findall(answer) + URL_CITATION.findall(answer)))
 
     # ---------- couche 1 : regles
+    if "PREUVES INSUFFISANTES" in answer.upper():
+        return {"ok": False, "reasons": ["les passages recuperes ne repondent pas a la question"],
+                "citations": [], "llm_calls": 0}
     if not answer.strip():
         reasons.append("reponse vide")
     if not documents and not external:
