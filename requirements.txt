@@ -1,0 +1,7 @@
+datasets
+rank_bm25
+langgraph
+langchain-core
+langchain-ollama
+streamlit
+ddgs
